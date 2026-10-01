@@ -1,0 +1,188 @@
+// ==========================================
+// AUTOSTART & ENVIRONMENT
+// ==========================================
+spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP=Niri"
+spawn-at-startup "systemctl" "--user" "import-environment" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP"
+spawn-at-startup "/usr/lib/xdg-desktop-portal" "-r"
+spawn-at-startup "noctalia"
+prefer-no-csd
+// Примечание: autotiling убран — в Niri скроллящаяся лента работает из коробки.
+
+// ==========================================
+// OUTPUTS
+// ==========================================
+output "HDMI-A-1" {
+    mode "1920x1080"
+    scale 1.0
+}
+
+// ==========================================
+// INPUTS & KEYBOARD
+// ==========================================
+input {
+    keyboard {
+        xkb {
+            layout "us,ru"
+            options "grp:alt_shift_toggle"
+        }
+    }
+    touchpad {
+            tap                   // Клики по касанию (tap-to-click)
+            natural-scroll        // Естественная прокрутка (как на смартфонах/macOS)
+            accel-speed 0.2       // Чувствительность указателя (от -1.0 до 1.0)
+            dwt                   // Блокировать тачпад во время набора текста (Disable While Typing)
+            // middle-emulation   // Эмуляция средней кнопки мыши (одновременный клик двумя пальцами)
+        }
+    focus-follows-mouse
+}
+
+// ==========================================
+// GAPS, CORNERS & BORDERS
+// ==========================================
+layout {
+    gaps 12
+
+    // Настройка рамки активного окна
+    focus-ring {
+        width 2                   // Толщина рамки в пикселях (по умолчанию 4, поставь 1 или 2)
+        // active-color "#7fc8ff"    // Цвет рамки активного окна
+            
+        // Если хочешь сделать тонкие градиентные рамки:
+        active-gradient from="#8aadf4" to="#f5bde6" angle=45
+    }
+
+    // Внешние отступы (эквивалент gaps outer 4)
+    struts {
+        left 4
+        right 4
+        top 4
+        bottom 4
+    }
+
+    border {
+        off
+    }
+
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+
+    default-column-width { proportion 0.5; }
+}
+
+// Скругление углов для окон (corner_radius 12)
+window-rule {
+    geometry-corner-radius 12
+    clip-to-geometry true
+}
+
+// ==========================================
+// KEYBINDINGS
+// ==========================================
+binds {
+    // Системные и основные приложения
+    Mod+Shift+Slash { show-hotkey-overlay; }
+    Mod+T { spawn "alacritty"; }
+    Mod+B { spawn "firefox"; }
+    Mod+E { spawn "thunar"; }
+    Mod+G { spawn "steam"; }
+    Mod+D { spawn "vesktop"; }
+    Mod+N { spawn "obs"; }
+    Mod+I { spawn "swaylock"; }
+    Mod+R { spawn "rofi" "-show" "drun"; }
+    Mod+C { close-window; }
+    Mod+Shift+E { quit; }
+    Mod+Tab { toggle-overview; }
+    Mod+M { maximize-column; }
+    Mod+Alt+C { center-column; }
+    Mod+BracketLeft  { consume-window-into-column; }
+    Mod+BracketRight { expel-window-from-column; }
+    Mod+Page_Down       { focus-workspace-down; }
+    Mod+Page_Up         { focus-workspace-up; }
+    Mod+Shift+Page_Down { move-column-to-workspace-down; }
+    Mod+Shift+Page_Up   { move-column-to-workspace-up; }
+    Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }
+    Mod+WheelScrollUp        cooldown-ms=150 { focus-workspace-up; }
+
+    // Скриншот в буфер обмена
+    Print { spawn "sh" "-c" "grim -g \"$(slurp)\" - | wl-copy"; }
+
+    // Управление Dunst
+    Mod+Space { spawn "dunstctl" "close"; }
+    Mod+Shift+Space { spawn "dunstctl" "close-all"; }
+    Mod+Grave { spawn "dunstctl" "history-pop"; }
+
+    // Громкость и медиа
+    XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+    XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    XF86AudioMute { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86AudioMicMute { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+    XF86AudioNext { spawn "playerctl" "next"; }
+    XF86AudioPause { spawn "playerctl" "play-pause"; }
+    XF86AudioPlay { spawn "playerctl" "play-pause"; }
+    XF86AudioPrev { spawn "playerctl" "previous"; }
+
+    // Яркость
+    XF86MonBrightnessUp { spawn "brightnessctl" "set" "+5%"; }
+    XF86MonBrightnessDown { spawn "brightnessctl" "set" "5%-"; }
+
+    // Навигация по окнам и колонкам
+    Mod+Left  { focus-column-left; }
+    Mod+Right { focus-column-right; }
+    Mod+Up    { focus-window-or-workspace-up; }
+    Mod+Down  { focus-window-or-workspace-down; }
+
+    // Перемещение окон
+    Mod+Shift+H { move-column-left; }
+    Mod+Shift+L { move-column-right; }
+    Mod+Shift+J { move-window-down; }
+    Mod+Shift+K { move-window-up; }
+
+    // Изменение размеров
+    Mod+H { set-column-width "-10%"; }
+    Mod+L { set-column-width "+10%"; }
+    Mod+K { set-window-height "-10%"; }
+    Mod+J { set-window-height "+10%"; }
+
+    // Режимы окна
+    Mod+Z { fullscreen-window; }
+    Mod+V { toggle-window-floating; }
+    Mod+P { switch-preset-column-width; }
+
+    // Переключение на прошлый воркспейс
+    Alt+Tab { focus-workspace-previous; }
+
+    // Переключение рабочих столов свайпом пальцами (скроллом) с зажатым Mod
+    // cooldown-ms предотвращает слишком быстрое "проскакивание" нескольких рабочих столов
+    Mod+TouchpadScrollDown cooldown-ms=150 { focus-workspace-down; }
+    Mod+TouchpadScrollUp   cooldown-ms=150 { focus-workspace-up; }
+    
+    // Перемещение активного окна на рабочий стол выше/ниже
+    Mod+Shift+TouchpadScrollDown cooldown-ms=150 { move-column-to-workspace-down; }
+    Mod+Shift+TouchpadScrollUp   cooldown-ms=150 { move-column-to-workspace-up; }
+
+    // Рабочие столы (1–10)
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+    Mod+6 { focus-workspace 6; }
+    Mod+7 { focus-workspace 7; }
+    Mod+8 { focus-workspace 8; }
+    Mod+9 { focus-workspace 9; }
+    Mod+0 { focus-workspace 10; }
+
+    Mod+Shift+1 { move-column-to-workspace 1; }
+    Mod+Shift+2 { move-column-to-workspace 2; }
+    Mod+Shift+3 { move-column-to-workspace 3; }
+    Mod+Shift+4 { move-column-to-workspace 4; }
+    Mod+Shift+5 { move-column-to-workspace 5; }
+    Mod+Shift+6 { move-column-to-workspace 6; }
+    Mod+Shift+7 { move-column-to-workspace 7; }
+    Mod+Shift+8 { move-column-to-workspace 8; }
+    Mod+Shift+9 { move-column-to-workspace 9; }
+    Mod+Shift+0 { move-column-to-workspace 10; }
+}
