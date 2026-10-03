@@ -1,6 +1,9 @@
 // cameroonets's niri config
-
-spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP=Niri"
+// required packages list below
+// xwayland-sattelite matugen noctalia rofi alacritty
+//spawn-at-startup "flameshot"
+spawn-at-startup "xwayland-satellite"
+spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP=niri"
 spawn-at-startup "systemctl" "--user" "import-environment" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP"
 spawn-at-startup "/usr/lib/xdg-desktop-portal" "-r"
 spawn-at-startup "noctalia"
@@ -78,12 +81,11 @@ binds {
     Mod+G { spawn "steam"; }
     Mod+D { spawn "vesktop"; }
     Mod+N { spawn "obs"; }
-    Mod+I { spawn "swaylock"; }
     Mod+R { spawn "rofi" "-show" "drun"; }
     Mod+C { close-window; }
     Mod+Shift+E { quit; }
     Mod+Tab { toggle-overview; }
-    Mod+M { maximize-column; }
+    Mod+X { maximize-column; }
     Mod+Alt+C { center-column; }
     Mod+BracketLeft  { consume-window-into-column; }
     Mod+BracketRight { expel-window-from-column; }
@@ -95,6 +97,8 @@ binds {
     Mod+WheelScrollUp        cooldown-ms=150 { focus-workspace-up; }
 
     Print { spawn "sh" "-c" "grim -g \"$(slurp)\" - | wl-copy"; }
+    //Print { spawn "sh" "-c" "wayfreeze & PID=$!; grim -g \"$(slurp)\" - | satty --filename -; kill $PID 2>/dev/null"; }
+	//Print { spawn "flameshot" "gui"; }
 
     Mod+Space { spawn "dunstctl" "close"; }
     Mod+Shift+Space { spawn "dunstctl" "close-all"; }
